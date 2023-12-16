@@ -32,15 +32,18 @@ const AddItems = (props) => {
     const newCategory = formData;
 
     try {
-      const docRef = doc(db, "householditems", "7lJo4W3RGRuZ9zL5a4FW");
+      // Create a temporary ID for the new item
+      const tempId = Date.now().toString();
+      // Update the local state immediately
+      props.updateItems([...props.householditems, { id: tempId, categories: [newCategory] }]);
+
+      const docRef = await addDoc(collection(db, "householditems"), { categories: [newCategory] });
+
       await updateDoc(docRef, {
         categories: arrayUnion(newCategory),
       });
 
       console.log("New category added successfully");
-
-      // Call the update function passed from the parent
-      props.updateItems([...props.householditems, { categories: [newCategory] }]);
     } catch (error) {
       console.error("Error adding new category: ", error);
     }
