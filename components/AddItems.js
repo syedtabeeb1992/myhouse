@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { db } from "../firebase-config";
 import {
     collection,
@@ -9,7 +9,9 @@ import {
     doc,
     arrayRemove,
   } from "firebase/firestore";
-const AddItems = () => {
+const AddItems = (props) => {
+
+
   const [formData, setFormData] = useState({
     name: "", // Initialize with appropriate default values
     quantity: 0,
@@ -36,14 +38,16 @@ const AddItems = () => {
       });
 
       console.log("New category added successfully");
-    //   getdata();
+
+      // Call the update function passed from the parent
+      props.updateItems([...props.householditems, { categories: [newCategory] }]);
     } catch (error) {
       console.error("Error adding new category: ", error);
     }
   };
 
   const update = async () => {
-    console.log("UPDATED");
+
     try {
       if (!formData.name) {
         console.error("Name is required for update");

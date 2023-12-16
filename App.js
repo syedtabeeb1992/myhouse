@@ -15,16 +15,19 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase-config";
 
-
 const App = () => {
-
-
-  const householditems = useGetdata()
-
-  console.log("APP COMPONENT", householditems);
-
+  const [householditems, setHouseholdItems] = useState([]);
+  const householditemsData = useGetdata();
+  useEffect(() => {
+    setHouseholdItems(householditemsData);
+  }, [householditemsData]);
+  const updateHouseholdItems = (newItems) => {
+    setHouseholdItems(newItems);
+  };
 
   const deleteItems = async (itemName, documentId) => {
+
+
     try {
       // Remove the item from Firestore
       const docRef = doc(db, "householditems", documentId);
@@ -37,17 +40,17 @@ const App = () => {
       });
 
       // Update the state to reflect the changes in the UI
-      sethouseholditems((prevItems) => {
-        const updatedItems = prevItems.map((item) => {
-          if (item.id === documentId && item.categories) {
-            item.categories = item.categories.filter(
-              (category) => category.name !== itemName
-            );
-          }
-          return item;
-        });
-        return updatedItems;
-      });
+      // sethouseholditems((prevItems) => {
+      //   const updatedItems = prevItems.map((item) => {
+      //     if (item.id === documentId && item.categories) {
+      //       item.categories = item.categories.filter(
+      //         (category) => category.name !== itemName
+      //       );
+      //     }
+      //     return item;
+      //   });
+      //   return updatedItems;
+      // });
 
       console.log(`Deleted item with name: ${itemName}`);
     } catch (error) {
@@ -55,9 +58,8 @@ const App = () => {
     }
   };
 
-
   const edit = (response) => {
-    console.log("BOBO", response);
+
 
     setFormData((prevData) => ({
       ...prevData,
@@ -71,7 +73,10 @@ const App = () => {
 
   return (
     <div>
-      <AddItems />
+      <AddItems
+        householditems={householditems}
+        updateItems={updateHouseholdItems}
+      />
 
       {householditems.map((items) => {
         if (items.categories && Array.isArray(items.categories)) {
@@ -90,7 +95,7 @@ const App = () => {
             );
           });
         }
-        return null; // or handle the case where categories is not an array
+        return null;
       })}
     </div>
   );
