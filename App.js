@@ -42,6 +42,11 @@ const App = () => {
 
   return (
     <div>
+             <AddItems
+            householditems={householditems}
+            updateItems={updateHouseholdItems}
+            editData={editData}
+          />
       {householditems.map((items) => {
         if (items.categories && Array.isArray(items.categories)) {
           return items.categories.map((response) => (
