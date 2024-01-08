@@ -30,19 +30,30 @@ const AddItems = (props) => {
 
   const handleSubmit = async () => {
     const newCategory = formData;
-
+  
     try {
-      // Create a temporary ID for the new item
-      const tempId = Date.now().toString();
-      // Update the local state immediately
-      props.updateItems([...props.householditems, { id: tempId, categories: [newCategory] }]);
-
-      const docRef = await addDoc(collection(db, "householditems"), { categories: [newCategory] });
-
+      if (!props.householditems.length) {
+        console.error("No existing document to update");
+        return;
+      }
+  
+      // Assuming you want to add the new category to the first document in the array
+      const firstDocumentId = props.householditems[0].id;
+  
+      const docRef = doc(db, "householditems", firstDocumentId);
+  
       await updateDoc(docRef, {
         categories: arrayUnion(newCategory),
       });
-
+  
+      // Update the local state immediately
+      props.updateItems((prevItems) => {
+        const updatedItems = [...prevItems];
+        // Update the categories array of the first document
+        updatedItems[0].categories.push(newCategory);
+        return updatedItems;
+      });
+  
       console.log("New category added successfully");
     } catch (error) {
       console.error("Error adding new category: ", error);
