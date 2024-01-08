@@ -17,6 +17,7 @@ const AddItems = (props) => {
     quantity: 0,
     boughtdate: "",
     expirydate: "",
+    category:"",
     veg: true, // Default to veg
   });
 
@@ -144,6 +145,13 @@ const AddItems = (props) => {
       <select name="veg" value={formData.veg} onChange={handleChange}>
         <option value="veg">Veg</option>
         <option value="nonVeg">Non-Veg</option>
+      </select>
+
+
+      <select name="category" value={formData.category} onChange={handleChange}>
+        <option value="food">food</option>
+        <option value="electricals">electricals</option>
+        <option value="others">others</option>
       </select>
 
       <button onClick={handleSubmit}>Add Item</button>

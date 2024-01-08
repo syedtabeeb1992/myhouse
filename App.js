@@ -68,6 +68,7 @@ const App = () => {
           <p>Bought on - {response.boughtdate}</p>
           <p>Expiring on - {response.expirydate}</p>
           <p>Quantity - {response.quantity}</p>
+          <p>Quantity - {response.category}</p>
           <button
                 onClick={() => deleteItems(response.name, items.id)}
               >
