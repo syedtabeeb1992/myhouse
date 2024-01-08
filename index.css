@@ -1,3 +1,10 @@
 .heading {
   color: red;
 }
+.modal{
+  background: red;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}

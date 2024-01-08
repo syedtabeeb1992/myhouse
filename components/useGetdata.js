@@ -3,11 +3,6 @@ import { useEffect, useState } from "react";
 import {
   collection,
   getDocs,
-  addDoc,
-  arrayUnion,
-  updateDoc,
-  doc,
-  arrayRemove,
 } from "firebase/firestore";
 import { db } from "../firebase-config";
 

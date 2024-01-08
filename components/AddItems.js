@@ -11,7 +11,15 @@ import {
   } from "firebase/firestore";
 const AddItems = (props) => {
 
-
+  useEffect(() => {
+    setFormData(props.editData || {
+      name: "",
+      quantity: 0,
+      boughtdate: "",
+      expirydate: "",
+      veg: true,
+    });
+  }, [props.editData]);
   const [formData, setFormData] = useState({
     name: "", // Initialize with appropriate default values
     quantity: 0,
@@ -101,7 +109,7 @@ const AddItems = (props) => {
 
   return (
     <div className="" style={{ border: "1px solid green", padding: "10px" }}>
-      <h1>Add Itedddsssssms</h1>
+      <h1>Add smss</h1>
       <input
         type="text"
         placeholder="Name of the item"
