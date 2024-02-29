@@ -9,6 +9,7 @@ import useDeleteItem from "./components/useDeleteItem";
 
 const App = () => {
   const [householditems, setHouseholdItems] = useState([]);
+  
   const householditemsData = useGetdata();
   const { deleteItem, error } = useDeleteItem();
   const [modal, setModal] = useState(false);
@@ -46,6 +47,7 @@ const App = () => {
             householditems={householditems}
             updateItems={updateHouseholdItems}
             editData={editData}
+            
           />
       {householditems.map((items) => {
         if (items.categories && Array.isArray(items.categories)) {

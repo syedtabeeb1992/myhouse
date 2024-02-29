@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../firebase-config";
 import {
-    collection,
-    getDocs,
-    addDoc,
-    arrayUnion,
-    updateDoc,
-    doc,
-    arrayRemove,
-  } from "firebase/firestore";
+  doc,
+  updateDoc,
+  arrayRemove,
+  arrayUnion,
+} from "firebase/firestore";
+import { db } from "../firebase-config";
+
 const AddItems = (props) => {
+  const [formData, setFormData] = useState({
+    name: "", // Initialize with appropriate default values
+    quantity: 0,
+    boughtdate: "",
+    expirydate: "",
+    veg: true, // Default to veg
+  });
 
   useEffect(() => {
     setFormData(props.editData || {
@@ -20,13 +25,6 @@ const AddItems = (props) => {
       veg: true,
     });
   }, [props.editData]);
-  const [formData, setFormData] = useState({
-    name: "", // Initialize with appropriate default values
-    quantity: 0,
-    boughtdate: "",
-    expirydate: "",
-    veg: true, // Default to veg
-  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,87 +35,85 @@ const AddItems = (props) => {
   };
 
   const handleSubmit = async () => {
-    const newCategory = formData;
-  
     try {
-      if (!props.householditems.length) {
-        console.error("No existing document to update");
-        return;
-      }
-  
-      // Assuming you want to add the new category to the first document in the array
-      const firstDocumentId = props.householditems[0].id;
-  
-      const docRef = doc(db, "householditems", firstDocumentId);
-  
-      await updateDoc(docRef, {
-        categories: arrayUnion(newCategory),
-      });
-  
-      // Update the local state immediately
-      props.updateItems((prevItems) => {
-        const updatedItems = [...prevItems];
-        // Update the categories array of the first document
-        updatedItems[0].categories.push(newCategory);
-        return updatedItems;
-      });
-  
-      console.log("New category added successfully");
-    } catch (error) {
-      console.error("Error adding new category: ", error);
-    }
-  };
-
-  const update = async () => {
-    try {
-      if (!formData.name) {
-        console.error("Name is required for update");
-        return;
-      }
-
       const docRef = doc(db, "householditems", "7lJo4W3RGRuZ9zL5a4FW");
-
-      const householditems = props.householditems; // Access householditems from props
-
-      const categoryIndex = householditems.findIndex((item) =>
-        item.categories.some((category) => category.name === formData.name)
-      );
-
-      if (categoryIndex === -1) {
-        console.error("Category not found for update");
-        return;
-      }
-
-      await updateDoc(docRef, {
-        categories: arrayRemove(
-          householditems[categoryIndex].categories.find(
-            (category) => category.name === formData.name
-          )
-        ),
-      });
 
       await updateDoc(docRef, {
         categories: arrayUnion(formData),
       });
 
-      setFormData((prevData) => ({
-        ...prevData,
-        name: "", // Reset the form after update
+      props.updateItems((prevItems) => {
+        const updatedItems = [...prevItems];
+        updatedItems[0].categories.push(formData);
+        return updatedItems;
+      });
+
+      console.log("New item added successfully");
+      setFormData({
+        name: "",
         quantity: 0,
         boughtdate: "",
         expirydate: "",
         veg: true,
-      }));
+      });
+    } catch (error) {
+      console.error("Error adding new item: ", error);
+    }
+  };
 
+
+  const handleUpdate = async () => {
+
+    console.log("props", props.householditems);
+
+    try {
+      // Check if the category name is provided
+      if (!formData.name) {
+        console.error("Name is required for update");
+        return;
+      }
+  
+      // Find the index of the category to update in the householditems array
+      const categoryIndex = props.householditems.findIndex((item) =>
+        item.categories.some((category) => category.name === formData.name)
+      );
+
+      // Check if the category exists
+      if (categoryIndex === -1) {
+        console.error("Category not found for update");
+        return;
+      }
+  
+      // Get the document reference for the Firestore document
+      // Here, you might need a dynamic document ID instead of hardcoding "7lJo4W3RGRuZ9zL5a4FW"
+      const docRef = doc(db, "householditems", "7lJo4W3RGRuZ9zL5a4FW");
+  
+      // Remove the existing category from Firestore using arrayRemove
+      await updateDoc(docRef, {
+        categories: arrayRemove(props.householditems[categoryIndex].categories[0]), // Remove the entire category object
+      });
+  
+      // Add the updated category to Firestore using arrayUnion
+      await updateDoc(docRef, {
+        categories: arrayUnion({ ...formData }), // Add the updated category object
+      });
+  
       console.log("Category updated successfully");
     } catch (error) {
       console.error("Error updating category: ", error);
     }
   };
 
+  
+  
+  
+
+
+  
+
   return (
     <div className="" style={{ border: "1px solid green", padding: "10px" }}>
-      <h1>Add smss</h1>
+      <h1>Add Item</h1>
       <input
         type="text"
         placeholder="Name of the item"
@@ -152,7 +148,7 @@ const AddItems = (props) => {
       </select>
 
       <button onClick={handleSubmit}>Add Item</button>
-      <button onClick={update}>UPDATE</button>
+      <button onClick={handleUpdate}>UPDATE</button>
     </div>
   );
 };
