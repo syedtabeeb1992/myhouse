@@ -49,10 +49,10 @@ const App = () => {
             editData={editData}
             
           />
-      {householditems.map((items) => {
-        if (items.categories && Array.isArray(items.categories)) {
-          return items.categories.map((response) => (
-            <div key={response.name}>
+{householditems.map((items, index) => {
+  if (items.categories && Array.isArray(items.categories)) {
+    return items.categories.map((response, subIndex) => (
+      <div key={`${items.id}-${subIndex}`}> {/* Ensure keys are unique */}
               <h1>{response.name}</h1>
               <p>Bought on - {response.boughtdate}</p>
               <p>Expiring on - {response.expirydate}</p>
@@ -69,7 +69,7 @@ const App = () => {
 
       {modal ? (
         <div className="modal">
-          <h1>THIS IS A MODAL</h1>
+          <h1>THIS IS A lklklklklk</h1>
 
           <AddItems
             householditems={householditems}

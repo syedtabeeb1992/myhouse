@@ -63,50 +63,55 @@ const AddItems = (props) => {
 
 
   const handleUpdate = async () => {
-
-    console.log("props", props.householditems);
-
     try {
-      // Check if the category name is provided
+      // Ensure the formData contains a valid name (you can add more validation if needed)
       if (!formData.name) {
         console.error("Name is required for update");
         return;
       }
   
-      // Find the index of the category to update in the householditems array
-      const categoryIndex = props.householditems.findIndex((item) =>
-        item.categories.some((category) => category.name === formData.name)
+      // Identify the selected item in the householditems array
+      const selectedItemIndex = props.householditems.findIndex(item =>
+        item.categories.some(category => category.name === formData.name)
       );
-
-      // Check if the category exists
-      if (categoryIndex === -1) {
-        console.error("Category not found for update");
+  
+      if (selectedItemIndex === -1) {
+        console.error("Selected item not found");
         return;
       }
   
-      // Get the document reference for the Firestore document
-      // Here, you might need a dynamic document ID instead of hardcoding "7lJo4W3RGRuZ9zL5a4FW"
-      const docRef = doc(db, "householditems", "7lJo4W3RGRuZ9zL5a4FW");
+      // Create a copy of the householditems array to avoid mutating state directly
+      const updatedItems = [...props.householditems];
   
-      // Remove the existing category from Firestore using arrayRemove
-      await updateDoc(docRef, {
-        categories: arrayRemove(props.householditems[categoryIndex].categories[0]), // Remove the entire category object
+      // Update the selected item's data in the local state
+      updatedItems[selectedItemIndex].categories.forEach(category => {
+        if (category.name === formData.name) {
+          category.name === formData.name
+          category.quantity = formData.quantity;
+          category.boughtdate = formData.boughtdate;
+          category.expirydate = formData.expirydate;
+          category.veg = formData.veg;
+        }
       });
+
+
+      console.log(updatedItems);
+
+      return false
   
-      // Add the updated category to Firestore using arrayUnion
-      await updateDoc(docRef, {
-        categories: arrayUnion({ ...formData }), // Add the updated category object
-      });
+      // Update the selected item's data in Firebase
+      const docRef = doc(db, "householditems", "7lJo4W3RGRuZ9zL5a4FW"); // Update with the correct document ID
+      await updateDoc(docRef, { categories: updatedItems[selectedItemIndex].categories });
   
-      console.log("Category updated successfully");
+      // Update the local state with the updated items array
+      props.updateItems(updatedItems);
+  
+      console.log("Item updated successfully");
     } catch (error) {
-      console.error("Error updating category: ", error);
+      console.error("Error updating item: ", error);
     }
   };
 
-  
-  
-  
 
 
   
