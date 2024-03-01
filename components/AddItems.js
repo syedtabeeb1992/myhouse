@@ -97,7 +97,7 @@ const AddItems = (props) => {
 
       console.log(updatedItems);
 
-      return false
+     
   
       // Update the selected item's data in Firebase
       const docRef = doc(db, "householditems", "7lJo4W3RGRuZ9zL5a4FW"); // Update with the correct document ID
