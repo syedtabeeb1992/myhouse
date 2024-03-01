@@ -10,6 +10,7 @@ import { db } from "../firebase-config";
 const AddItems = (props) => {
   const [formData, setFormData] = useState({
     name: "", // Initialize with appropriate default values
+    id:"",
     quantity: 0,
     boughtdate: "",
     expirydate: "",
@@ -19,6 +20,7 @@ const AddItems = (props) => {
   useEffect(() => {
     setFormData(props.editData || {
       name: "",
+      id:"",
       quantity: 0,
       boughtdate: "",
       expirydate: "",
@@ -51,6 +53,7 @@ const AddItems = (props) => {
       console.log("New item added successfully");
       setFormData({
         name: "",
+        id:"",
         quantity: 0,
         boughtdate: "",
         expirydate: "",
@@ -65,14 +68,14 @@ const AddItems = (props) => {
   const handleUpdate = async () => {
     try {
       // Ensure the formData contains a valid name (you can add more validation if needed)
-      if (!formData.name) {
+      if (!formData.id) {
         console.error("Name is required for update");
         return;
       }
   
       // Identify the selected item in the householditems array
       const selectedItemIndex = props.householditems.findIndex(item =>
-        item.categories.some(category => category.name === formData.name)
+        item.categories.some(category => category.name === formData.id)
       );
   
       if (selectedItemIndex === -1) {
@@ -83,10 +86,12 @@ const AddItems = (props) => {
       // Create a copy of the householditems array to avoid mutating state directly
       const updatedItems = [...props.householditems];
   
-      // Update the selected item's data in the local state
+
+
       updatedItems[selectedItemIndex].categories.forEach(category => {
-        if (category.name === formData.name) {
-          category.name === formData.name
+        if (category.name === formData.id) {
+          category.name = formData.name; // Update the name here
+      
           category.quantity = formData.quantity;
           category.boughtdate = formData.boughtdate;
           category.expirydate = formData.expirydate;
@@ -94,10 +99,9 @@ const AddItems = (props) => {
         }
       });
 
+console.log(updatedItems);
 
-      console.log(updatedItems);
 
-      return false
   
       // Update the selected item's data in Firebase
       const docRef = doc(db, "householditems", "7lJo4W3RGRuZ9zL5a4FW"); // Update with the correct document ID
@@ -118,12 +122,21 @@ const AddItems = (props) => {
 
   return (
     <div className="" style={{ border: "1px solid green", padding: "10px" }}>
-      <h1>Add Item</h1>
+      <h1>Add Itemsss</h1>
+
       <input
         type="text"
         placeholder="Name of the item"
         name="name"
         value={formData.name}
+        onChange={handleChange}
+      />
+
+  <input
+        type="text"
+        placeholder="ID"
+        name="id"
+        value={formData.id}
         onChange={handleChange}
       />
       <input
@@ -159,3 +172,5 @@ const AddItems = (props) => {
 };
 
 export default AddItems;
+
+

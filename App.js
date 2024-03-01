@@ -41,6 +41,13 @@ const App = () => {
     setEditData(response); // Set the data of the clicked item
   };
 
+  const closeModal = () => {
+    console.log("clos");
+    setModal(false);
+    setEditData(null); // Reset editData state
+  };
+  
+
   return (
     <div>
              <AddItems
@@ -52,12 +59,13 @@ const App = () => {
 {householditems.map((items, index) => {
   if (items.categories && Array.isArray(items.categories)) {
     return items.categories.map((response, subIndex) => (
-      <div key={`${items.id}-${subIndex}`}> {/* Ensure keys are unique */}
+      <div key={response.id}> {/* Ensure keys are unique */}
               <h1>{response.name}</h1>
+              <p> <i>{response.id}</i></p>
               <p>Bought on - {response.boughtdate}</p>
               <p>Expiring on - {response.expirydate}</p>
               <p>Quantity - {response.quantity}</p>
-              <button onClick={() => deleteItems(response.name, items.id)}>
+              <button onClick={() => deleteItems(response.id, items.id)}>
                 Delete
               </button>
               <button onClick={() => edit(response)}>EDIT</button>
@@ -69,15 +77,14 @@ const App = () => {
 
       {modal ? (
         <div className="modal">
-          <h1>THIS IS A lklklklklk</h1>
-
+          <h1>THIS IS A ;'</h1>
           <AddItems
-            householditems={householditems}
-            updateItems={updateHouseholdItems}
-            editData={editData}
-          />
+      householditems={householditems}
+      updateItems={updateHouseholdItems}
+      editData={editData}
+    />
 
-          <button onClick={() => setModal(false)}>close</button>
+<button onClick={closeModal}>close</button>
         </div>
       ) : (
         <>{/* your other content here */}</>
