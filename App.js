@@ -3,30 +3,30 @@ import ReactDOM from "react-dom/client";
 
 import AddItems from "./components/AddItems";
 import useGetdata from "./components/useGetdata";
-
-import {
-  collection,
-  getDocs,
-  addDoc,
-  arrayUnion,
-  updateDoc,
-  doc,
-  arrayRemove,
-} from "firebase/firestore";
-import { db } from "./firebase-config";
 import useDeleteItem from "./components/useDeleteItem";
+import SimpleModal from "./components/SimpleModal";
+
+import './styles/global.css'
+
+
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 
 const App = () => {
   const [householditems, setHouseholdItems] = useState([]);
   const householditemsData = useGetdata();
   const { deleteItem, error } = useDeleteItem();
-  
+  const [editData, setEditData] = useState(null); // State to store the data of the clicked item
+  const [modalOpen, setModalOpen] = useState(false); // State to manage modal open/close
+
   useEffect(() => {
     setHouseholdItems(householditemsData);
   }, [householditemsData]);
+
   const updateHouseholdItems = (newItems) => {
     setHouseholdItems(newItems);
   };
+
   const deleteItems = async (itemName, documentId) => {
     try {
       if (!documentId || !householditems) {
@@ -39,46 +39,56 @@ const App = () => {
     }
   };
 
-  
+  const handleEditModalOpen = () => {
+    setModalOpen(true);
+  };
+
   const edit = (response) => {
 
+    setEditData(response);
+    setModalOpen(true); 
+  };
 
-    setFormData((prevData) => ({
-      ...prevData,
-      name: response.name || prevData.name,
-      quantity: response.quantity || prevData.quantity,
-      boughtdate: response.boughtdate || prevData.boughtdate,
-      expirydate: response.expirydate || prevData.expirydate,
-      veg: response.veg !== undefined ? response.veg : prevData.veg,
-    }));
+  const handleCloseModal = () => {
+    setModalOpen(false); 
+  };
+
+  const handleOpeneModal = () => {
+    setModalOpen(true);
   };
 
   return (
     <div>
-      <AddItems
+
+      <Fab className="custom-fab" onClick={handleOpeneModal} color="primary" aria-label="add">
+        <AddIcon />
+      </Fab>
+      <SimpleModal
+        open={modalOpen}
+        handleCloseModal={handleCloseModal}
         householditems={householditems}
         updateItems={updateHouseholdItems}
+        editData={editData}
+        handleEditModalOpen={handleEditModalOpen} 
       />
 
-{householditems.map((items) => {
-    if (items.categories && Array.isArray(items.categories)) {
-      return items.categories.map((response) => (
-        <div key={response.name}>
-          <h1>{response.name}</h1>
-          <p>Bought on - {response.boughtdate}</p>
-          <p>Expiring on - {response.expirydate}</p>
-          <p>Quantity - {response.quantity}</p>
-          <button
-                onClick={() => deleteItems(response.name, items.id)}
-              >
+      {householditems.map((items, index) => {
+        if (items.categories && Array.isArray(items.categories)) {
+          return items.categories.map((response, subIndex) => (
+            <div key={`${items.id}-${subIndex}`}>
+              <h1>{response.name}</h1>
+              <p>Bought on - {response.boughtdate}</p>
+              <p>Expiring on - {response.expirydate}</p>
+              <p>Quantity - {response.quantity}</p>
+              <button onClick={() => deleteItems(response.name, items.id)}>
                 Delete
               </button>
-          <button onClick={() => edit(response)}>EDIT</button>
-        </div>
-      ));
-    }
-    return null;
-  })}
+              <button onClick={() => edit(response)}>EDIT</button>
+            </div>
+          ));
+        }
+        return null;
+      })}
     </div>
   );
 };
