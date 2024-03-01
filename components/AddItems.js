@@ -49,6 +49,9 @@ const AddItems = (props) => {
       });
 
       console.log("New item added successfully");
+
+      props.handleCloseModal();
+
       setFormData({
         name: "",
         quantity: 0,

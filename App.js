@@ -1,19 +1,23 @@
-// App.js
-
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 
 import AddItems from "./components/AddItems";
 import useGetdata from "./components/useGetdata";
 import useDeleteItem from "./components/useDeleteItem";
+import SimpleModal from "./components/SimpleModal";
+
+import './styles/global.css'
+
+
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 
 const App = () => {
   const [householditems, setHouseholdItems] = useState([]);
-  
   const householditemsData = useGetdata();
   const { deleteItem, error } = useDeleteItem();
-  const [modal, setModal] = useState(false);
   const [editData, setEditData] = useState(null); // State to store the data of the clicked item
+  const [modalOpen, setModalOpen] = useState(false); // State to manage modal open/close
 
   useEffect(() => {
     setHouseholdItems(householditemsData);
@@ -35,24 +39,43 @@ const App = () => {
     }
   };
 
+  const handleEditModalOpen = () => {
+    setModalOpen(true);
+  };
+
   const edit = (response) => {
-    console.log(response);
-    setModal(true);
-    setEditData(response); // Set the data of the clicked item
+
+    setEditData(response);
+    setModalOpen(true); 
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false); 
+  };
+
+  const handleOpeneModal = () => {
+    setModalOpen(true);
   };
 
   return (
     <div>
-             <AddItems
-            householditems={householditems}
-            updateItems={updateHouseholdItems}
-            editData={editData}
-            
-          />
-{householditems.map((items, index) => {
-  if (items.categories && Array.isArray(items.categories)) {
-    return items.categories.map((response, subIndex) => (
-      <div key={`${items.id}-${subIndex}`}> {/* Ensure keys are unique */}
+
+      <Fab className="custom-fab" onClick={handleOpeneModal} color="primary" aria-label="add">
+        <AddIcon />
+      </Fab>
+      <SimpleModal
+        open={modalOpen}
+        handleCloseModal={handleCloseModal}
+        householditems={householditems}
+        updateItems={updateHouseholdItems}
+        editData={editData}
+        handleEditModalOpen={handleEditModalOpen} 
+      />
+
+      {householditems.map((items, index) => {
+        if (items.categories && Array.isArray(items.categories)) {
+          return items.categories.map((response, subIndex) => (
+            <div key={`${items.id}-${subIndex}`}>
               <h1>{response.name}</h1>
               <p>Bought on - {response.boughtdate}</p>
               <p>Expiring on - {response.expirydate}</p>
@@ -66,22 +89,6 @@ const App = () => {
         }
         return null;
       })}
-
-      {modal ? (
-        <div className="modal">
-          <h1>THIS IS A lklklklklk</h1>
-
-          <AddItems
-            householditems={householditems}
-            updateItems={updateHouseholdItems}
-            editData={editData}
-          />
-
-          <button onClick={() => setModal(false)}>close</button>
-        </div>
-      ) : (
-        <>{/* your other content here */}</>
-      )}
     </div>
   );
 };
