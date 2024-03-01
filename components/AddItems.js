@@ -34,7 +34,7 @@ const AddItems = (props) => {
     }));
   };
 
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
     try {
       const docRef = doc(db, "householditems", "7lJo4W3RGRuZ9zL5a4FW");
 
@@ -60,6 +60,7 @@ const AddItems = (props) => {
       console.error("Error adding new item: ", error);
     }
   };
+
 
 
   const handleUpdate = async () => {
