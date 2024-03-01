@@ -95,7 +95,6 @@ const AddItems = (props) => {
       });
 
 
-      console.log(updatedItems);
 
      
   
