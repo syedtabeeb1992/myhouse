@@ -11,6 +11,17 @@ import {
   TextField,
 } from "@mui/material";
 
+import { LocalizationProvider } from "@mui/x-date-pickers";
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
+
+
+import { DatePicker } from "@mui/x-date-pickers";
+
+
+
+
 import "./AddItems.css";
 const AddItems = (props) => {
   const [formData, setFormData] = useState({
@@ -141,13 +152,18 @@ const AddItems = (props) => {
             />
           </Grid>
           <Grid item xs={6}>
-          <TextField fullWidth
+          {/* <TextField fullWidth
               label="Bought Date"
               variant="outlined"
               name="boughtdate"
               value={formData.boughtdate}
               onChange={handleChange}
-            />
+            /> */}
+
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker label="select date"/>
+            </LocalizationProvider>
+
           </Grid>
           <Grid item xs={6}>
           <TextField fullWidth
