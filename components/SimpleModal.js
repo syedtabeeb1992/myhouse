@@ -4,6 +4,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import AddItems from "./AddItems";
+import '../styles/global.css'
 
 const SimpleModal = ({
   open,
@@ -27,14 +28,14 @@ const SimpleModal = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 800,
+            width: "50%",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
           }}
         >
           <Typography variant="h6" component="h2" gutterBottom>
-            Modal Title
+           Add Item
           </Typography>
           <AddItems
             householditems={householditems}
@@ -42,7 +43,9 @@ const SimpleModal = ({
             editData={editData}
             handleCloseModal={handleCloseModal}
           />
-          <Button onClick={handleCloseModal}>Close Modal</Button>{" "}
+ 
+       
+          <Button className="mt-1" variant="contained" onClick={handleCloseModal}>Close </Button>{" "}
           {/* Add close button */}
         </Box>
       </Modal>
