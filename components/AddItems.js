@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { doc, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
+import { doc, updateDoc, arrayRemove, arrayUnion, getDoc } from "firebase/firestore";
 import { db } from "../firebase-config";
 import {
   Button,
@@ -52,24 +52,38 @@ const AddItems = (props) => {
     }));
   };
 
+  const formDataForUpdate = {
+    name: formData.name,
+    quantity: formData.quantity,
+    boughtdate: formData.boughtdate,
+    expirydate: formData.expirydate,
+    veg: formData.veg,
+  };
+  
+
+
   const handleSubmit = async () => {
     try {
-      const docRef = doc(db, "householditems", "7lJo4W3RGRuZ9zL5a4FW");
+      const docRef = doc(db, "householditems/7lJo4W3RGRuZ9zL5a4FW");
+  
+      const docSnapshot = await getDoc(docRef);
+      const currentData = docSnapshot.data().categories || [];
+  
+      const updatedData = [...currentData, formDataForUpdate];
+  
+      console.log(formDataForUpdate)
 
-      await updateDoc(docRef, {
-        categories: arrayUnion(formData),
-      });
-
+      await updateDoc(docRef, { categories: updatedData });
+  
       props.updateItems((prevItems) => {
         const updatedItems = [...prevItems];
-        updatedItems[0].categories.push(formData);
+        updatedItems[0].categories.push(formDataForUpdate);
+        console.log("updated", updatedItems);
         return updatedItems;
       });
-
-      console.log("New item added successfully");
-
+  
       props.handleCloseModal();
-
+  
       setFormData({
         name: "",
         quantity: 0,
@@ -81,6 +95,45 @@ const AddItems = (props) => {
       console.error("Error adding new item: ", error);
     }
   };
+  
+  
+  // const handleDateChange = (date) => {
+  //   const formattedDate = date ? date.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : ""; // Convert to IST format
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     boughtdate: formattedDate, // Update boughtdate with the formatted date
+  //   }));
+  // };
+  
+  const handleDateChange = (date) => {
+    if (!date) return;
+
+    // Create a new Date object with the selected date
+    const selectedDate = new Date(date);
+
+    // Get the date components
+    const year = selectedDate.getFullYear();
+    const month = selectedDate.getMonth() + 1; 
+    const day = selectedDate.getDate();
+
+    // Format the date string
+    const formattedDate = `${day.toString().padStart(2, '0')} / ${month.toString().padStart(2, '0')} / ${year}`;
+
+    console.log("selected date", formattedDate);
+
+    
+    const istOffset = 330 * 60 * 1000; 
+    const istDate = new Date(selectedDate.getTime() + istOffset);
+  
+ 
+   
+  
+    setFormData((prevData) => ({
+      ...prevData,
+      boughtdate: formattedDate, // Update boughtdate with the formatted date
+    }));
+  };
+  
 
   const handleUpdate = async () => {
     try {
@@ -161,7 +214,7 @@ const AddItems = (props) => {
             /> */}
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker label="select date"/>
+              <DatePicker onChange={handleDateChange} label="select date"/>
             </LocalizationProvider>
 
           </Grid>
