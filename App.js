@@ -70,21 +70,14 @@ const App = () => {
 {householditems.map((items, index) => {
   if (items.categories && Array.isArray(items.categories)) {
     return items.categories.map((response, subIndex) => {
-      const currentDate = new Date();
-      const expiryDate = new Date(response.expirydate); // Convert the expiry date string to a Date object
-      
-      // Calculate the difference in milliseconds between the expiry date and the current date
-      const timeDifference = expiryDate.getTime() - currentDate.getTime();
-      
-      // Convert milliseconds to days
-      const daystoexpire = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
       return (
         <div key={`${items.id}-${subIndex}`}>
           <h1>{response.name}</h1>
           <p>Bought on - {response.boughtdate}</p>
           <p>Expiring on - {response.expirydate}</p>
           <p>Quantity - {response.quantity}</p>
-          <p>Days before expiry - {daystoexpire}</p>
+          <p>Days to Expire : {response.daysToExpire}</p>
           <button onClick={() => deleteItems(response.name, items.id)}>
             Delete
           </button>
