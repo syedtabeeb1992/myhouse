@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { doc, updateDoc, arrayRemove, arrayUnion, getDoc } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  arrayRemove,
+  arrayUnion,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "../firebase-config";
 import {
   Button,
@@ -13,14 +19,9 @@ import {
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-
-
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 import { DatePicker } from "@mui/x-date-pickers";
-
-
-
 
 import "./AddItems.css";
 const AddItems = (props) => {
@@ -46,9 +47,10 @@ const AddItems = (props) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const newValue = name === "veg" ? e.target.value === "veg" : e.target.value;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: newValue,
     }));
   };
 
@@ -59,31 +61,29 @@ const AddItems = (props) => {
     expirydate: formData.expirydate,
     veg: formData.veg,
   };
-  
-
 
   const handleSubmit = async () => {
     try {
       const docRef = doc(db, "householditems/7lJo4W3RGRuZ9zL5a4FW");
-  
+
       const docSnapshot = await getDoc(docRef);
       const currentData = docSnapshot.data().categories || [];
-  
+
       const updatedData = [...currentData, formDataForUpdate];
-  
-      console.log(formDataForUpdate)
+
+      console.log(formDataForUpdate);
 
       await updateDoc(docRef, { categories: updatedData });
-  
+
       props.updateItems((prevItems) => {
         const updatedItems = [...prevItems];
         updatedItems[0].categories.push(formDataForUpdate);
         console.log("updated", updatedItems);
         return updatedItems;
       });
-  
+
       props.handleCloseModal();
-  
+
       setFormData({
         name: "",
         quantity: 0,
@@ -95,45 +95,34 @@ const AddItems = (props) => {
       console.error("Error adding new item: ", error);
     }
   };
-  
-  
-  // const handleDateChange = (date) => {
-  //   const formattedDate = date ? date.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : ""; // Convert to IST format
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     boughtdate: formattedDate, // Update boughtdate with the formatted date
-  //   }));
-  // };
-  
-  const handleDateChange = (date) => {
+
+  const handleDateChange = (date, type) => {
     if (!date) return;
-
-    // Create a new Date object with the selected date
     const selectedDate = new Date(date);
-
-    // Get the date components
     const year = selectedDate.getFullYear();
-    const month = selectedDate.getMonth() + 1; 
+    const month = selectedDate.getMonth() + 1;
     const day = selectedDate.getDate();
-
-    // Format the date string
-    const formattedDate = `${day.toString().padStart(2, '0')} / ${month.toString().padStart(2, '0')} / ${year}`;
-
+    const formattedDate = `${day.toString().padStart(2, "0")} / ${month
+      .toString()
+      .padStart(2, "0")} / ${year}`;
     console.log("selected date", formattedDate);
-
-    
-    const istOffset = 330 * 60 * 1000; 
+    const istOffset = 330 * 60 * 1000;
     const istDate = new Date(selectedDate.getTime() + istOffset);
-  
- 
-   
-  
-    setFormData((prevData) => ({
-      ...prevData,
-      boughtdate: formattedDate, // Update boughtdate with the formatted date
-    }));
+
+    if (type === "boughtdate") {
+      setFormData((prevData) => ({
+        ...prevData,
+        boughtdate: formattedDate,
+      }));
+    } else if (type === "expirydate") {
+      setFormData((prevData) => ({
+        ...prevData,
+        expirydate: formattedDate,
+      }));
+    }
   };
-  
+
+
 
   const handleUpdate = async () => {
     try {
@@ -183,11 +172,12 @@ const AddItems = (props) => {
   };
 
   return (
-    <div className="" >
+    <div className="">
       <div className="text-fields-wrapper">
         <Grid container spacing={2}>
           <Grid item xs={6}>
-            <TextField fullWidth
+            <TextField
+              fullWidth
               label="Name of the item"
               variant="outlined"
               name="name"
@@ -196,7 +186,8 @@ const AddItems = (props) => {
             />
           </Grid>
           <Grid item xs={6}>
-          <TextField fullWidth
+            <TextField
+              fullWidth
               name="quantity"
               value={formData.quantity}
               onChange={handleChange}
@@ -205,28 +196,20 @@ const AddItems = (props) => {
             />
           </Grid>
           <Grid item xs={6}>
-          {/* <TextField fullWidth
-              label="Bought Date"
-              variant="outlined"
-              name="boughtdate"
-              value={formData.boughtdate}
-              onChange={handleChange}
-            /> */}
-
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker onChange={handleDateChange} label="select date"/>
+              <DatePicker
+                onChange={(date) => handleDateChange(date, "boughtdate")}
+                label="select date"
+              />
             </LocalizationProvider>
-
           </Grid>
           <Grid item xs={6}>
-          <TextField fullWidth
-              label="Expiry date"
-              variant="outlined"
-              placeholder="Expiry date"
-              name="expirydate"
-              value={formData.expirydate}
-              onChange={handleChange}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                onChange={(date) => handleDateChange(date, "expirydate")}
+                label="select date"
+              />
+            </LocalizationProvider>
           </Grid>
           <Grid item xs={6}>
             <FormControl fullWidth>
@@ -237,9 +220,13 @@ const AddItems = (props) => {
             </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <Button  variant="contained" onClick={handleSubmit}>Add Item</Button>
+            <Button variant="contained" onClick={handleSubmit}>
+              Add Item
+            </Button>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <Button  variant="contained" onClick={handleUpdate}>UPDATE</Button>
+            <Button variant="contained" onClick={handleUpdate}>
+              UPDATE
+            </Button>
           </Grid>
         </Grid>
       </div>
@@ -248,3 +235,5 @@ const AddItems = (props) => {
 };
 
 export default AddItems;
+
+
