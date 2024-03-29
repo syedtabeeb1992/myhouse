@@ -4,16 +4,26 @@ import AddItems from "./components/AddItems";
 import useGetdata from "./components/useGetdata";
 import useDeleteItem from "./components/useDeleteItem";
 import SimpleModal from "./components/SimpleModal";
-import './styles/global.css'
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
+import "./styles/global.css";
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
+import { Margin } from "@mui/icons-material";
 
 const App = () => {
+
+
+
+
+
+
+
+
   const [householditems, setHouseholdItems] = useState([]);
   const householditemsData = useGetdata();
   const { deleteItem, error } = useDeleteItem();
   const [editData, setEditData] = useState(null); // State to store the data of the clicked item
   const [modalOpen, setModalOpen] = useState(false); // State to manage modal open/close
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     setHouseholdItems(householditemsData);
@@ -40,23 +50,32 @@ const App = () => {
   };
 
   const edit = (response) => {
-
     setEditData(response);
-    setModalOpen(true); 
+
+    console.log("EDIT RESPONSE", response);
+    setModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    setModalOpen(false); 
+    setModalOpen(false);
   };
 
   const handleOpeneModal = () => {
     setModalOpen(true);
   };
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <div>
-
-      <Fab className="custom-fab" onClick={handleOpeneModal} color="primary" aria-label="add">
+      <Fab
+        className="custom-fab"
+        onClick={handleOpeneModal}
+        color="primary"
+        aria-label="add"
+      >
         <AddIcon />
       </Fab>
       <SimpleModal
@@ -65,29 +84,46 @@ const App = () => {
         householditems={householditems}
         updateItems={updateHouseholdItems}
         editData={editData}
-        handleEditModalOpen={handleEditModalOpen} 
+        handleEditModalOpen={handleEditModalOpen}
       />
-{householditems.map((items, index) => {
-  if (items.categories && Array.isArray(items.categories)) {
-    return items.categories.map((response, subIndex) => {
 
-      return (
-        <div key={`${items.id}-${subIndex}`}>
-          <h1>{response.name}</h1>
-          <p>Bought on - {response.boughtdate}</p>
-          <p>Expiring on - {response.expirydate}</p>
-          <p>Quantity - {response.quantity}</p>
-          <p>Days to Expire : {response.daysToExpire}</p>
-          <button onClick={() => deleteItems(response.name, items.id)}>
-            Delete
-          </button>
-          <button onClick={() => edit(response)}>EDIT</button>
-        </div>
-      );
-    });
-  }
-  return null;
-})}
+      <input
+        type="text"
+        placeholder="Search..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+        className="searchBox"
+      />
+      <div className="wrapperItems">
+        {householditems
+          .filter((items) => {
+            return items.categories.some((response) =>
+              response.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+          })
+          .map((items, index) => {
+            if (items.categories && Array.isArray(items.categories)) {
+              return items.categories.map((response, subIndex) => {
+                return (
+                  <div className="card" key={`${items.id}-${subIndex}`}>
+                    <h1>{response.name}</h1>
+                    <p>Bought on - {response.boughtdate}</p>
+                    <p>Expiring on - {response.expirydate}</p>
+                    <p>Quantity - {response.quantity}</p>
+          
+                    <button
+                      onClick={() => deleteItems(response.name, items.id)}
+                    >
+                      Delete
+                    </button>
+                    <button onClick={() => edit(response)}>EDIT</button>
+                  </div>
+                );
+              });
+            }
+            return null;
+          })}
+      </div>
     </div>
   );
 };
