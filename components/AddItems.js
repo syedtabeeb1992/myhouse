@@ -115,33 +115,28 @@ const AddItems = (props) => {
   
     // Calculate the difference in milliseconds between the expiry date and the current date
     const timeDifference = selectedDate.getTime() - currentDate.getTime();
-  
-    // Convert milliseconds to days
-    const daysToExpire = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-  
-    const year = selectedDate.getFullYear();
-    const month = selectedDate.getMonth() + 1;
-    const day = selectedDate.getDate();
-    const formattedDate = `${day.toString().padStart(2, "0")} / ${month
-      .toString()
-      .padStart(2, "0")} / ${year}`;
-  
 
+    
+    const milliseconds = selectedDate.getTime(); // Convert selected date to milliseconds
+    const formattedDate =milliseconds
   
     if (type === "boughtdate") {
       setFormData((prevData) => ({
         ...prevData,
         boughtdate: formattedDate,
+        boughtdateMilliseconds: milliseconds // Add milliseconds to state if needed
 
       }));
     } else if (type === "expirydate") {
       setFormData((prevData) => ({
         ...prevData,
         expirydate: formattedDate,
+        expirydateMilliseconds: milliseconds // Add milliseconds to state if needed
 
       }));
     }
   };
+
   
 
   const handleUpdate = async () => {

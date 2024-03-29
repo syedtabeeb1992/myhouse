@@ -10,14 +10,6 @@ import AddIcon from "@mui/icons-material/Add";
 import { Margin } from "@mui/icons-material";
 
 const App = () => {
-
-
-
-
-
-
-
-
   const [householditems, setHouseholdItems] = useState([]);
   const householditemsData = useGetdata();
   const { deleteItem, error } = useDeleteItem();
@@ -68,6 +60,36 @@ const App = () => {
     setSearchQuery(event.target.value);
   };
 
+  const formatDateFromMilliseconds = (milliseconds) => {
+    // Create a new Date object using the milliseconds
+    const date = new Date(milliseconds);
+
+    // Get the components of the date
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Month starts from 0
+    const year = date.getFullYear();
+
+    // Format the date components as DD/MM/YYYY
+    const formattedDate = `${day.toString().padStart(2, "0")}/${month
+      .toString()
+      .padStart(2, "0")}/${year}`;
+
+    return formattedDate;
+  };
+
+  const expirydate = (milliseconds) => {
+    // Get the current date in milliseconds
+    const currentDate = new Date().getTime();
+
+    // Calculate the difference in milliseconds between the expiry date and the current date
+    const timeDifference = milliseconds - currentDate;
+
+    // Convert milliseconds to days
+    const daysToExpire = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+    return daysToExpire;
+  };
+
   return (
     <div>
       <Fab
@@ -107,10 +129,18 @@ const App = () => {
                 return (
                   <div className="card" key={`${items.id}-${subIndex}`}>
                     <h1>{response.name}</h1>
-                    <p>Bought on - {response.boughtdate}</p>
-                    <p>Expiring on - {response.expirydate}</p>
+                    <p>
+                      Bought on -{" "}
+                      {formatDateFromMilliseconds(response.boughtdate)}
+                    </p>
+                    <p>
+                      Expiring on -{" "}
+                      {formatDateFromMilliseconds(response.expirydate)}
+                    </p>
                     <p>Quantity - {response.quantity}</p>
-          
+
+                    <p>Expires in - {expirydate(response.expirydate)} Days</p>
+
                     <button
                       onClick={() => deleteItems(response.name, items.id)}
                     >
@@ -124,6 +154,7 @@ const App = () => {
             return null;
           })}
       </div>
+
     </div>
   );
 };
