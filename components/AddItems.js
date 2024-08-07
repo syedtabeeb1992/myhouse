@@ -31,25 +31,32 @@ const AddItems = (props) => {
     boughtdate: "",
     expirydate: "",
     veg: true, // Default to veg
-    daysToExpire:null
+
   });
 
   useEffect(() => {
-    setFormData(
-      props.editData || {
+    if (props.editData) {
+      const { boughtdate, expirydate } = props.editData;
+      setFormData({
+        ...props.editData,
+        boughtdate: boughtdate ? new Date(boughtdate) : new Date(), // Set default to current date if not provided
+        expirydate: expirydate ? new Date(expirydate) : new Date(), // Set default to current date if not provided
+      });
+    } else {
+      setFormData({
         name: "",
         quantity: 0,
-        boughtdate: "",
-        expirydate: "",
+        boughtdate: new Date(), // Set default to current date
+        expirydate: new Date(), // Set default to current date
         veg: true,
-        daysToExpire:null
-      }
-    );
+  
+      });
+    }
   }, [props.editData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const newValue = name === "veg" ? e.target.value === "veg" : e.target.value;
+    const newValue = name === "veg" ? e.target.value : value; // Ensure correct value for 'veg'
     setFormData((prevData) => ({
       ...prevData,
       [name]: newValue,
@@ -62,7 +69,7 @@ const AddItems = (props) => {
     boughtdate: formData.boughtdate,
     expirydate: formData.expirydate,
     veg: formData.veg,
-    daysToExpire:formData.daysToExpire
+
   };
 
   const handleSubmit = async () => {
@@ -93,48 +100,12 @@ const AddItems = (props) => {
         boughtdate: "",
         expirydate: "",
         veg: true,
-        daysToExpire:null
+
       });
     } catch (error) {
       console.error("Error adding new item: ", error);
     }
   };
-
-
-  // const handleDateChange = (date, type) => {
-  //   if (!date) return;
-    
-  //   const selectedDate = new Date(date);
-  //   const currentDate = new Date();
-    
-  //   // Calculate the difference in milliseconds between the expiry date and the current date
-  //   const timeDifference = selectedDate.getTime() - currentDate.getTime();
-    
-  //   // Convert milliseconds to days
-  //   const daysToExpire = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-  
-  //   const year = selectedDate.getFullYear();
-  //   const month = selectedDate.getMonth() + 1;
-  //   const day = selectedDate.getDate();
-  //   const formattedDate = `${day.toString().padStart(2, "0")} / ${month.toString().padStart(2, "0")} / ${year}`;
-    
-  //   console.log("selected date", formattedDate);
-  //   console.log("days to expire", daysToExpire);
-    
-  //   if (type === "boughtdate") {
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       boughtdate: formattedDate,
-  //       daysToExpire:daysToExpire
-  //     }));
-  //   } else if (type === "expirydate") {
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       expirydate: formattedDate,
-  //       daysToExipre: daysToExpire, // Assign the calculated days to expire
-  //     }));
-  //   }
-  // };
 
   const handleDateChange = (date, type) => {
     if (!date) return;
@@ -144,37 +115,29 @@ const AddItems = (props) => {
   
     // Calculate the difference in milliseconds between the expiry date and the current date
     const timeDifference = selectedDate.getTime() - currentDate.getTime();
-  
-    // Convert milliseconds to days
-    const daysToExpire = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-  
-    const year = selectedDate.getFullYear();
-    const month = selectedDate.getMonth() + 1;
-    const day = selectedDate.getDate();
-    const formattedDate = `${day.toString().padStart(2, "0")} / ${month.toString().padStart(2, "0")} / ${year}`;
-  
-    console.log("selected date", formattedDate);
-    console.log("days to expire", daysToExpire);
+
+    
+    const milliseconds = selectedDate.getTime(); // Convert selected date to milliseconds
+    const formattedDate =milliseconds
   
     if (type === "boughtdate") {
       setFormData((prevData) => ({
         ...prevData,
         boughtdate: formattedDate,
-        daysToExpire: daysToExpire
+        boughtdateMilliseconds: milliseconds // Add milliseconds to state if needed
+
       }));
     } else if (type === "expirydate") {
       setFormData((prevData) => ({
         ...prevData,
         expirydate: formattedDate,
-        daysToExpire: daysToExpire, // Assign the calculated days to expire
+        expirydateMilliseconds: milliseconds // Add milliseconds to state if needed
+
       }));
     }
   };
-  
 
   
-
-
 
   const handleUpdate = async () => {
     try {
@@ -205,6 +168,7 @@ const AddItems = (props) => {
           category.boughtdate = formData.boughtdate;
           category.expirydate = formData.expirydate;
           category.veg = formData.veg;
+
         }
       });
 
@@ -248,18 +212,20 @@ const AddItems = (props) => {
             />
           </Grid>
           <Grid item xs={6}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                onChange={(date) => handleDateChange(date, "boughtdate")}
-                label="select date"
-              />
-            </LocalizationProvider>
+            <LocalizationProvider   dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  onChange={(date) => handleDateChange(date, "boughtdate")}
+                  label="select date"
+                />
+              </LocalizationProvider>
           </Grid>
           <Grid item xs={6}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 onChange={(date) => handleDateChange(date, "expirydate")}
                 label="select date"
+                 
+             
               />
             </LocalizationProvider>
           </Grid>
@@ -287,5 +253,3 @@ const AddItems = (props) => {
 };
 
 export default AddItems;
-
-
